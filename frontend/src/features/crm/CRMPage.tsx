@@ -191,8 +191,8 @@ const ACTIVITY_KINDS: ActivityKind[] = ['call', 'meeting', 'email', 'task', 'not
 // rollups (MultiCurrencyTotal / MoneyDisplay) consistent by preventing
 // free-text codes that would key the per-currency split incorrectly.
 const CURRENCY_CODES = [
-  'EUR',
   'USD',
+  'EUR',
   'GBP',
   'CHF',
   'CAD',
@@ -2085,7 +2085,7 @@ function LeadDrawer({
     account_id: '',
     stage_id: '',
     estimated_value: '0',
-    currency: 'EUR',
+    currency: 'USD',
     probability_percent: '20',
   });
 
@@ -2907,7 +2907,7 @@ function CreateModal({
     new_account_name: '',
     title: '',
     estimated_value: '0',
-    currency: 'EUR',
+    currency: 'USD',
     probability_percent: '20',
     stage_id: stages[0]?.id || '',
     expected_close_date: '',
