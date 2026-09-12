@@ -1,0 +1,63 @@
+# Standalone preview — Sacco Enterprises OCERP fork
+# Usage: docker compose -f docker-compose.preview.yml up -d
+#
+# First create .env file:
+#   echo "POSTGRES_PASSWORD=$(openssl rand -base64 24)" > .env
+#   echo "JWT_SECRET=$(openssl rand -hex 32)"           >> .env
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: oe
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: openestimate
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U oe -d openestimate"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.ocerp
+    image: ocerp-sacco-preview:latest
+    container_name: ocerp-preview
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8081:8080"
+    environment:
+      OE_DB_HOST: postgres
+      OE_DB_PORT: "5432"
+      OE_DB_USER: oe
+      OE_DB_NAME: openestimate
+      OE_DB_PASSWORD: "${POSTGRES_PASSWORD}"
+      JWT_SECRET: "${JWT_SECRET}"
+      SERVE_FRONTEND: "true"
+      ALLOWED_ORIGINS: "http://localhost:8081,http://100.113.194.47:8081,http://home.coysacco.com"
+      APP_ENV: development
+      APP_DEBUG: "true"
+      VECTOR_BACKEND: lancedb
+      OE_DATA_DIR: /data
+    volumes:
+      - app_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  pg_data:
+    driver: local
+  app_data:
+    driver: local
