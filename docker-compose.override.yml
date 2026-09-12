@@ -1,0 +1,10 @@
+# docker-compose.override.yml — custom OCERP fork with MuPDF baked in
+# Place next to the original docker-compose.yml and run:
+#   docker compose -f docker-compose.yml -f docker-compose.override.yml up -d
+services:
+  openconstructionerp:
+    build:
+      context: .
+      dockerfile: Dockerfile.ocerp
+    image: ocerp-mupdf:latest
+    container_name: ocerp
